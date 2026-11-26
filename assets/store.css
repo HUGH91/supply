@@ -27,28 +27,23 @@ button { font-family: inherit; }
 .hint { position: absolute; top: 32px; left: 0; right: 0; text-align: center; font-size: 13px; color: var(--muted); z-index: 4; }
 
 .stand { position: absolute; bottom: 60px; transform-origin: bottom center; transition: opacity .35s; }
-.stand.side { width: 180px; margin-left: -90px; transform: scale(.78); opacity: .95; }
+.stand.side { width: 210px; margin-left: -105px; opacity: .95; }
 .stand.l { left: 17%; } .stand.r { left: 83%; }
 .stand.center { left: 50%; width: 360px; margin-left: -180px; height: 600px; bottom: 30px; }
+.stand.side, .stand.center { z-index: 1; }
 .center model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
 .star { position: absolute; top: -6px; left: 50%; margin-left: -20px; width: 40px; height: 40px; filter: drop-shadow(0 0 8px var(--yellow)); z-index: 3; animation: bob 2.4s ease-in-out infinite; }
 @keyframes bob { 50% { transform: translateY(-6px); } }
 
-/* Placeholder figure (used until a fit has its own avatar) */
-.fig { display: flex; flex-direction: column; align-items: center; }
-.fig .hat { width: 74px; height: 26px; border-radius: 30px 30px 6px 6px; border: 1px solid rgba(0,0,0,.2); }
-.fig .head { width: 56px; height: 62px; border-radius: 26px 26px 22px 22px; margin-top: -4px; }
-.fig .neck { width: 22px; height: 12px; }
-.fig .torso { display: flex; gap: 2px; }
-.fig .arm { width: 28px; height: 160px; border-radius: 14px 4px 8px 8px; border: 1px solid rgba(0,0,0,.12); }
-.fig .body { width: 112px; height: 172px; border-radius: 20px 20px 4px 4px; border: 1px solid rgba(0,0,0,.12); }
-.fig .legs { display: flex; gap: 6px; margin-top: -2px; }
-.fig .leg { width: 52px; height: 190px; border: 1px solid rgba(0,0,0,.12); }
-.fig .feet { display: flex; gap: 8px; }
-.fig .shoe { width: 60px; height: 20px; border-radius: 10px 10px 3px 3px; border: 1px solid rgba(0,0,0,.25); }
-.fig div { transition: background .4s; }
-.center .fig { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); }
-.center .soon { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--muted); }
+/* Layer stacks: every file is 2400x4000, so a 3:5 box lines them up */
+.stack { position: relative; aspect-ratio: 3 / 5; }
+.stack img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.stand.side .stack { width: 100%; }
+#layered { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
+#layered .stack { height: 100%; }
+.view-toggle { position: absolute; top: 56px; left: 16px; display: flex; z-index: 6; border: 2px solid var(--ink); background: #FFF; }
+.view-toggle button { min-height: 40px; padding: 0 12px; border: 0; background: #FFF; font-weight: 700; font-size: 13px; cursor: pointer; }
+.view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--yellow); }
 
 .tap { position: absolute; top: 56px; bottom: 0; width: 28%; background: none; border: 0; cursor: pointer; z-index: 5; }
 .tap.prev { left: 0; } .tap.next { right: 0; }
@@ -65,6 +60,10 @@ h1 { font-family: "Archivo Black", sans-serif; font-size: clamp(32px, 4vw, 48px)
 .pieces { border: 2px solid var(--ink); padding: 4px 18px 18px; }
 .piece { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .swatch { width: 40px; height: 40px; flex: none; border: 1px solid rgba(0,0,0,.2); }
+.swatch.none { border-style: dashed; }
+.swap { display: flex; gap: 4px; }
+.swap button { width: 40px; min-height: 44px; border: 1px solid var(--ink); background: #FFF; font-size: 22px; line-height: 1; cursor: pointer; }
+.add-gap { width: 44px; flex: none; }
 .piece .info { flex: 1; min-width: 0; }
 .slot { font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--muted); }
 .pname { font-size: 16px; font-weight: 700; }
@@ -100,8 +99,7 @@ h1 { font-family: "Archivo Black", sans-serif; font-size: clamp(32px, 4vw, 48px)
   .wrap { padding: 0 14px; }
   .room { height: 600px; border-radius: 0; margin: 0 -14px; flex-basis: 100%; }
   .stand.l { left: 4%; } .stand.r { left: 96%; }
-  .stand.side { transform: scale(.55); }
+  .stand.side { width: 130px; margin-left: -65px; }
   .stand.center { width: 300px; margin-left: -150px; height: 520px; }
-  .center .fig { transform: translateX(-50%) scale(.82); transform-origin: bottom center; }
   .hint { display: none; }
 }

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/store.css?v=1">
+  <link rel="stylesheet" href="assets/store.css?v=2">
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </head>
 <body>
@@ -28,14 +28,18 @@
       <section class="room" id="room" aria-label="Fitting room">
         <div class="floor"></div>
         <div class="bars" id="bars" aria-hidden="true"></div>
-        <div class="hint">Tap a side or swipe to switch fits · drag the model to spin</div>
+        <div class="hint">Tap a side or swipe to switch fits · swap single pieces on the right</div>
+        <div class="view-toggle" id="viewToggle" role="group" aria-label="Model view">
+          <button type="button" id="view3d" aria-pressed="true">3D</button>
+          <button type="button" id="viewLayers" aria-pressed="false">Illustrated</button>
+        </div>
 
         <div class="stand side l" id="standL" aria-hidden="true"></div>
         <div class="stand side r" id="standR" aria-hidden="true"></div>
         <div class="stand center">
           <svg class="star" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1l3.1 7 7.6.7-5.8 5 1.8 7.5L12 17.3 5.3 21.2l1.8-7.5-5.8-5 7.6-.7z" fill="#FFD400" stroke="#0B0B0B" stroke-width="1"/></svg>
           <model-viewer id="avatar" camera-controls touch-action="pan-y" disable-zoom shadow-intensity="1" interaction-prompt="none" camera-orbit="0deg 85deg auto"></model-viewer>
-          <div id="placeholder" hidden></div>
+          <div id="layered" hidden></div>
         </div>
 
         <button class="tap prev" id="tapPrev" type="button"></button>
@@ -58,7 +62,7 @@
         <div>
           <div class="kicker" id="kicker"></div>
           <h1 id="fitName"></h1>
-          <p class="lede">Everything on the model is for sale. Get the whole fit or just one piece.</p>
+          <p class="lede">Everything on the model is for sale. Swap any piece with ‹ › to build your own fit, then grab the whole look or one piece.</p>
         </div>
         <div class="pieces">
           <div id="pieceList"></div>
@@ -87,7 +91,7 @@
   </aside>
   <div class="toast" id="toast" hidden role="status"></div>
 
-  <script src="data/fits.js?v=1"></script>
-  <script src="assets/store.js?v=1"></script>
+  <script src="data/fits.js?v=2"></script>
+  <script src="assets/store.js?v=2"></script>
 </body>
 </html>

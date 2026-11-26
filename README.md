@@ -8,9 +8,19 @@ Live: https://hugh91.github.io/supply/
 
 Everything the store shows lives in `data/fits.js`:
 
-- **Fits**: each fit has a name, brand, colors and its pieces.
+- **Pieces** (`H91_PIECES`): one entry per product, with its brand, slot, name, price and layer image.
+- **Fits** (`H91_FITS`): preset outfits shown on the stand and the mannequins. Shoppers can swap any piece to build their own.
 - **Prices**: put a number (e.g. `45`). `null` shows "Price TBA".
-- **3D avatar**: add `model: "models/your-file.glb"` to a fit. Fits without one show a placeholder figure.
+- **3D avatar**: add `model: "models/your-file.glb"` to a fit for the 3D view.
+
+## Layer art
+
+Every piece is a transparent 2400×4000 image drawn on the tracing template, so any piece stacks on any other.
+The full rules are in the art spec doc; the templates are in `art/`.
+
+- `art/template-guide.png`: tracing guide with Hugh's real proportions
+- `art/template-overlay.png`: the same outline and guide lines on a transparent layer
+- `art/layers/`: stand-in layers. Replace a file with real art under the same name, converted to `.webp`.
 
 ## Turning on Shopify checkout
 
