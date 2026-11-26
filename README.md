@@ -4,41 +4,32 @@ One fitting-room store for Hood Star, Hugh, Hugh's Hot Bowls, Satchmos and H91.
 
 Live: https://hugh91.github.io/supply/
 
-## Editing products
+## How it works
 
-Everything the store shows lives in `data/fits.js`:
+Every look is Hugh in the same pose, rendered from four angles plus a 3D model.
+Shoppers switch looks with a tap or swipe, turn Hugh with ↶ ↷ (front, right side, back, left side),
+or tap 3D to spin the model. The side mannequins are headless crops of the next and previous looks.
 
-- **Pieces** (`H91_PIECES`): one entry per product, with its brand, slot, name, price and layer image.
-- **Fits** (`H91_FITS`): preset outfits shown on the stand and the mannequins. Shoppers can swap any piece to build their own.
-- **Prices**: put a number (e.g. `45`). `null` shows "Price TBA".
-- **3D avatar**: add `model: "models/your-file.glb"` to a fit for the 3D view.
+## Files
 
-## Fit art
+- `art/looks/<look>_<front|right|back|left>.webp`: the four renders per look (420×880, transparent)
+- `models/looks/<look>.glb`: the 3D model per look (loads only when 3D is tapped)
+- `art/base/` and `models/base/`: Hugh in the cream base tee, kept for layering single pieces later
+- `data/fits.js`: products and looks; `assets/`: the store's code and styles
 
-Whole-fit illustrations (front and back) live in `art/fits/`, and their 3D models in `models/fits/`.
-A fit with `art` opens on the Front view, with Back and 3D next to it. `mannequin` sets the headless
-image used when the fit stands on a side mannequin.
+## Adding a look
 
-## Layer art
+1. Render the four angles in the same frame and pose as the existing ones, on white.
+2. Cut out the background and save them as `art/looks/<look>_<view>.webp`; add the GLB to `models/looks/`.
+3. Add the product to `H91_PIECES` and one line to `H91_FITS` in `data/fits.js`.
 
-Every piece is a transparent 2400×4000 image drawn on the tracing template, so any piece stacks on any other.
-The full rules are in the art spec doc; the templates are in `art/`.
+## Prices and Shopify checkout
 
-- `art/template-guide.png`: tracing guide with Hugh's real proportions
-- `art/template-overlay.png`: the same outline and guide lines on a transparent layer
-- `art/layers/`: stand-in layers. Replace a file with real art under the same name, converted to `.webp`.
+- **Prices**: put a number (e.g. `45`) on each piece. `null` shows "Price TBA".
+- **Checkout**: set `shopify.domain` (e.g. `h91-supply.myshopify.com`) and each piece's `variantId`.
+  Checkout then sends the bag straight to a Shopify cart.
 
-Mix and match stays off (`mixAndMatch: false` in `data/fits.js`) until real layer art exists; only pieces with a `layer` can be swapped.
+## Mix and match
 
-## Turning on Shopify checkout
-
-1. Create the products in Shopify.
-2. In `data/fits.js`, set `shopify.domain` (e.g. `h91-supply.myshopify.com`).
-3. Give each piece its Shopify `variantId`.
-
-Checkout then sends the bag straight to a Shopify cart.
-
-## Pages
-
-- `index.html`: the store
-- `avatar.html`: full-screen 3D avatar viewer
+Off for now (`mixAndMatch: false`). It turns on once single pieces have their own layer art;
+only pieces with a `layer` can be swapped.
