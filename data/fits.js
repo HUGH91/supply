@@ -24,6 +24,8 @@ window.H91_SHOP = {
   },
   // Mix and match (swapping single pieces) turns on once pieces have layer art.
   mixAndMatch: false,
+  // 3D view is hidden until the 3D models are improved; the files stay in models/.
+  show3d: false,
   slots: [
     { id: "shoes", label: "Shoes" },
     { id: "bottoms", label: "Bottoms" },

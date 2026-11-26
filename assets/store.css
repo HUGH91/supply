@@ -46,7 +46,12 @@ button { font-family: inherit; }
 .view-toggle { position: absolute; top: 56px; left: 16px; display: flex; z-index: 6; border: 2px solid var(--ink); background: #FFF; }
 .view-toggle button { min-height: 40px; padding: 0 12px; border: 0; background: #FFF; font-weight: 700; font-size: 13px; cursor: pointer; }
 .view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--yellow); }
-.view-toggle .angle { min-width: 84px; display: grid; place-items: center; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+.view-toggle .angle { min-width: 110px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.view-toggle .angle::after { content: " ↻"; font-size: 14px; }
+/* Turn arrows sit right beside the avatar, above the mannequin tap zones */
+.turn-arrow { position: absolute; top: 48%; width: 48px; height: 48px; margin-top: -24px; border-radius: 24px; border: 2px solid var(--ink); background: rgba(255,255,255,.92); color: var(--ink); display: grid; place-items: center; cursor: pointer; z-index: 7; }
+.turn-arrow.l { left: calc(50% - 175px); }
+.turn-arrow.r { left: calc(50% + 127px); }
 .view-toggle button { font-size: 16px; }
 
 .tap { position: absolute; top: 56px; bottom: 0; width: 28%; background: none; border: 0; cursor: pointer; z-index: 5; }
@@ -107,4 +112,7 @@ h1 { font-family: "Archivo Black", sans-serif; font-size: clamp(32px, 4vw, 48px)
   .stand.side { width: 130px; margin-left: -65px; }
   .stand.center { width: 300px; margin-left: -150px; height: 520px; }
   .hint { display: none; }
+  .turn-arrow { width: 44px; height: 44px; margin-top: -22px; }
+  .turn-arrow.l { left: calc(50% - 160px); }
+  .turn-arrow.r { left: calc(50% + 116px); }
 }
