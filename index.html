@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>H91 Supply · Avatar preview</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body { margin: 0; background: #F2F1EE; font-family: system-ui, sans-serif; color: #0B0B0B; }
+    header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 18px; margin: 0; letter-spacing: 0.06em; }
+    p { margin: 0; font-size: 14px; color: #444; }
+    model-viewer { width: 100%; height: calc(100vh - 70px); background: #F2F1EE; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>H91 SUPPLY</h1>
+    <p>Drag to spin · pinch to zoom</p>
+  </header>
+  <model-viewer
+    src="models/hugh-plaid.glb"
+    poster="models/hugh-plaid-preview.png"
+    alt="3D avatar of Hugh Augustine in a plaid shirt and jeans"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    touch-action="pan-y">
+  </model-viewer>
+</body>
+</html>
