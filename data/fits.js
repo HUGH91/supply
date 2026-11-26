@@ -14,6 +14,9 @@ window.H91_SHOP = {
     domain: "",          // e.g. "h91-supply.myshopify.com"
   },
   base: "art/layers/base_front.webp",
+  // Mix and match (swapping single pieces) turns on once real layer art exists
+  // for every piece. Until then shoppers switch whole fits.
+  mixAndMatch: false,
   // Bottom to top. Optional slots can be left empty when mixing and matching.
   slots: [
     { id: "shoes", label: "Shoes" },
@@ -40,6 +43,10 @@ window.H91_PIECES = {
   "hb-apron-tee":       { brand: "HUGH'S HOT BOWLS", slot: "tops", name: "[Hot Bowls apron tee]", color: "#F3E9D2", price: null, variantId: "", layer: "art/layers/hot-bowls_tops_apron-tee_cream.webp" },
   "sa-crewneck":        { brand: "SATCHMOS", slot: "tops", name: "[Satchmos crewneck]", color: "#5B2A86", price: null, variantId: "", layer: "art/layers/satchmos_tops_crewneck_purple.webp" },
 
+  "hs-washed-tee":      { brand: "HOOD STAR", slot: "tops", name: "Hood Star tee", detail: "Washed charcoal · Leimert Park print", color: "#3A3633", price: null, variantId: "", layer: null },
+  "h91-hoodie":         { brand: "H91", slot: "tops", name: "H91 hoodie", detail: "Forest green · varsity lettering", color: "#24402F", price: null, variantId: "", layer: null },
+  "hb-chore-coat":      { brand: "HUGH'S HOT BOWLS", slot: "outerwear", name: "Hot Bowls chore coat", detail: "Cobalt twill · embroidered patch", color: "#1F3C9C", price: null, variantId: "", layer: null },
+
   "plaid-overshirt":    { brand: "H91", slot: "outerwear", name: "[Plaid overshirt]", color: "#6E6A70", price: null, variantId: "", layer: "art/layers/h91_outerwear_plaid-overshirt_charcoal.webp" },
 
   "bandana":            { brand: "H91", slot: "headwear", name: "[Bandana]", color: "#2E2E2E", price: null, variantId: "", layer: "art/layers/h91_headwear_bandana_black.webp" },
@@ -49,16 +56,28 @@ window.H91_PIECES = {
   "sa-bucket":          { brand: "SATCHMOS", slot: "headwear", name: "[Satchmos bucket hat]", color: "#5B2A86", price: null, variantId: "", layer: "art/layers/satchmos_headwear_bucket-hat_purple.webp" },
 };
 
-// Preset fits shown on the stand and the mannequins. `model` adds the 3D view.
+// Preset fits shown on the stand and the mannequins.
+// `art` = front/back illustrations, `model` = 3D view, `draft: true` = hidden.
 window.H91_FITS = [
+  { id: "hood-star-tee", name: "Hood Star Tee Fit", brand: "HOOD STAR", model: "models/fits/hood-star-tee.glb",
+    art: { front: "art/fits/hood-star-tee_front.webp", back: "art/fits/hood-star-tee_back.webp" },
+    pieces: ["hs-washed-tee"] },
+  { id: "h91-hoodie", name: "H91 Hoodie Fit", brand: "H91", model: "models/fits/h91-hoodie.glb",
+    art: { front: "art/fits/h91-hoodie_front.webp", back: "art/fits/h91-hoodie_back.webp" },
+    pieces: ["h91-hoodie"] },
+  { id: "hot-bowls-coat", name: "Hot Bowls Coat Fit", brand: "HUGH'S HOT BOWLS", model: "models/fits/hot-bowls-coat.glb",
+    art: { front: "art/fits/hot-bowls-coat_front.webp", back: "art/fits/hot-bowls-coat_back.webp" },
+    pieces: ["hb-chore-coat"] },
   { id: "plaid", name: "The Plaid Fit", brand: "H91", model: "models/hugh-plaid-v2.glb", poster: "models/hugh-plaid-preview.png",
+    mannequin: "art/fits/plaid_mannequin.webp",
     pieces: ["boots-brown", "denim", "plain-tee", "plaid-overshirt", "bandana"] },
-  { id: "hood-star", name: "Hood Star Fit", brand: "HOOD STAR",
+  // Stand-in fits for testing mix and match; hidden until their art is real.
+  { id: "hood-star", name: "Hood Star Fit", brand: "HOOD STAR", draft: true,
     pieces: ["sneakers-white", "hs-cargos", "hs-logo-tee", "hs-cap"] },
-  { id: "hugh", name: "Hugh Fit", brand: "HUGH",
+  { id: "hugh", name: "Hugh Fit", brand: "HUGH", draft: true,
     pieces: ["sneakers-black", "denim", "hugh-tour-tee", "hugh-beanie"] },
-  { id: "hot-bowls", name: "Hot Bowls Fit", brand: "HUGH'S HOT BOWLS",
+  { id: "hot-bowls", name: "Hot Bowls Fit", brand: "HUGH'S HOT BOWLS", draft: true,
     pieces: ["sneakers-white", "hb-chef-pants", "hb-apron-tee", "hb-cap"] },
-  { id: "satchmos", name: "Satchmos Fit", brand: "SATCHMOS",
+  { id: "satchmos", name: "Satchmos Fit", brand: "SATCHMOS", draft: true,
     pieces: ["sneakers-white", "sa-shorts", "sa-crewneck", "sa-bucket"] },
 ];
