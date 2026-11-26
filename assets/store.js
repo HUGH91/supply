@@ -9,7 +9,9 @@
 
   var cur = 0;            // preset fit on the stand
   var outfit = {};        // slot id -> piece id (or null)
-  var view = "front";     // "front", "back", "3d" or "layers"
+  var view = "front";     // "front", "right", "back", "left", "3d" or "layers"
+  var TURN = ["front", "right", "back", "left"];
+  var TURN_LABEL = { front: "Front", right: "Right side", back: "Back", left: "Left side" };
   var saved = {};
   var bag = loadBag();
 
@@ -47,7 +49,7 @@
   // A stack of layer images, bottom to top. withBase=false makes a headless mannequin.
   function stack(o, withBase) {
     var box = el("div", "stack");
-    if (withBase && SHOP.base) box.appendChild(layerImg(SHOP.base));
+    if (withBase && SHOP.base && SHOP.base.views) box.appendChild(layerImg(SHOP.base.views.front));
     SLOTS.forEach(function (s) {
       var p = PIECES[o[s.id]];
       if (p && p.layer) box.appendChild(layerImg(p.layer));
@@ -59,18 +61,23 @@
     return i;
   }
 
-  function defaultView(f) { return f.art ? "front" : (f.model ? "3d" : "layers"); }
-  function viewsFor(f) {
-    var v = [];
-    if (f.art) v.push(["front", "Front"], ["back", "Back"]);
-    if (f.model) v.push(["3d", "3D"]);
-    if (MIX) v.push(["layers", "Mix"]);
-    return v;
-  }
+  function defaultView(f) { return f.views ? "front" : (f.model ? "3d" : "layers"); }
   function mannequin(f) {
-    var src = f.mannequin || (f.art && f.art.front);
+    var src = f.mannequin || (f.views && f.views.front);
     if (src) { var i = layerImg(src); i.className = "mannequin"; return i; }
     return stack(outfitOf(f), false);
+  }
+  function turn(dir) {
+    var i = TURN.indexOf(view);
+    view = i < 0 ? "front" : TURN[(i + dir + 4) % 4];
+    renderRoom();
+  }
+  function viewButton(label, aria, pressed, onClick) {
+    var b = el("button", "", label); b.type = "button";
+    if (aria) b.setAttribute("aria-label", aria);
+    if (pressed != null) b.setAttribute("aria-pressed", pressed ? "true" : "false");
+    b.addEventListener("click", onClick);
+    return b;
   }
 
   function renderRoom() {
@@ -82,30 +89,39 @@
 
     var m = matchingFit();
     var f = m > -1 ? FITS[m] : null;
-    var views = f ? viewsFor(f) : [["layers", "Mix"]];
-    if (!views.some(function (v) { return v[0] === view; })) view = views[0][0];
+    var ok = { "3d": !!(f && f.model), layers: MIX };
+    TURN.forEach(function (v) { ok[v] = !!(f && f.views && f.views[v]); });
+    if (!ok[view]) view = f ? defaultView(f) : "layers";
 
     var mv = $("avatar"), art = $("artView"), lay = $("layered");
-    mv.hidden = view !== "3d"; art.hidden = !(view === "front" || view === "back"); lay.hidden = view !== "layers";
+    var turning = TURN.indexOf(view) > -1;
+    mv.hidden = view !== "3d"; art.hidden = !turning; lay.hidden = view !== "layers";
     if (view === "3d") {
-      if (mv.getAttribute("src") !== f.model) { mv.setAttribute("poster", f.poster || ""); mv.setAttribute("src", f.model); }
+      if (mv.getAttribute("src") !== f.model) { mv.setAttribute("poster", f.views ? f.views.front : ""); mv.setAttribute("src", f.model); }
       mv.setAttribute("alt", "3D model of Hugh wearing the " + f.name);
-    } else if (!art.hidden) {
-      art.src = f.art[view];
-      art.alt = "Illustration of Hugh wearing the " + f.name + ", " + view + " view";
+    } else if (turning) {
+      art.src = f.views[view];
+      art.alt = "Hugh wearing the " + f.name + ", " + TURN_LABEL[view].toLowerCase() + " view";
     } else {
       var st = stack(outfit, true);
       st.setAttribute("role", "img");
       st.setAttribute("aria-label", "Hugh wearing " + wornIds().map(function (id) { return PIECES[id].name; }).join(", "));
       fill("layered", [st]);
     }
-    $("viewToggle").hidden = views.length < 2;
-    fill("viewToggle", views.map(function (v) {
-      var b = el("button", "", v[1]); b.type = "button";
-      b.setAttribute("aria-pressed", v[0] === view ? "true" : "false");
-      b.addEventListener("click", function () { view = v[0]; renderRoom(); });
-      return b;
-    }));
+
+    // View controls: turn left · current angle · turn right · 3D
+    var kids = [];
+    if (f && f.views) {
+      kids.push(viewButton("↶", "Turn left", null, function () { turn(-1); }));
+      var lab = el("span", "angle", turning ? TURN_LABEL[view] : "Turn");
+      lab.setAttribute("aria-live", "polite");
+      kids.push(lab);
+      kids.push(viewButton("↷", "Turn right", null, function () { turn(1); }));
+    }
+    if (ok["3d"]) kids.push(viewButton("3D", "Show in 3D", view === "3d", function () { view = view === "3d" ? "front" : "3d"; renderRoom(); }));
+    if (MIX) kids.push(viewButton("Mix", "Mix and match", view === "layers", function () { view = "layers"; renderRoom(); }));
+    fill("viewToggle", kids);
+    $("viewToggle").hidden = kids.length < 2;
     fill("bars", FITS.map(function (_, k) { var b = el("span"); if (k <= cur) b.className = "on"; return b; }));
   }
 

@@ -42,10 +42,12 @@ button { font-family: inherit; }
 #layered { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
 #layered .stack { height: 100%; }
 #artView { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
-.mannequin { width: 100%; aspect-ratio: 420 / 1024; object-fit: contain; clip-path: inset(18% 0 0 0); display: block; }
+.mannequin { width: 100%; aspect-ratio: 420 / 880; object-fit: contain; clip-path: inset(19.5% 0 0 0); display: block; }
 .view-toggle { position: absolute; top: 56px; left: 16px; display: flex; z-index: 6; border: 2px solid var(--ink); background: #FFF; }
 .view-toggle button { min-height: 40px; padding: 0 12px; border: 0; background: #FFF; font-weight: 700; font-size: 13px; cursor: pointer; }
 .view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--yellow); }
+.view-toggle .angle { min-width: 84px; display: grid; place-items: center; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+.view-toggle button { font-size: 16px; }
 
 .tap { position: absolute; top: 56px; bottom: 0; width: 28%; background: none; border: 0; cursor: pointer; z-index: 5; }
 .tap.prev { left: 0; } .tap.next { right: 0; }
