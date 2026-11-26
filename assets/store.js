@@ -2,13 +2,14 @@
   "use strict";
   var SHOP = window.H91_SHOP || { shopify: {}, slots: [] };
   var PIECES = window.H91_PIECES || {};
-  var FITS = window.H91_FITS || [];
+  var FITS = (window.H91_FITS || []).filter(function (f) { return !f.draft; });
   var SLOTS = SHOP.slots;
+  var MIX = !!SHOP.mixAndMatch;
   var n = FITS.length;
 
   var cur = 0;            // preset fit on the stand
   var outfit = {};        // slot id -> piece id (or null)
-  var view = "3d";        // "3d" or "layers"
+  var view = "front";     // "front", "back", "3d" or "layers"
   var saved = {};
   var bag = loadBag();
 
@@ -58,33 +59,53 @@
     return i;
   }
 
+  function defaultView(f) { return f.art ? "front" : (f.model ? "3d" : "layers"); }
+  function viewsFor(f) {
+    var v = [];
+    if (f.art) v.push(["front", "Front"], ["back", "Back"]);
+    if (f.model) v.push(["3d", "3D"]);
+    if (MIX) v.push(["layers", "Mix"]);
+    return v;
+  }
+  function mannequin(f) {
+    var src = f.mannequin || (f.art && f.art.front);
+    if (src) { var i = layerImg(src); i.className = "mannequin"; return i; }
+    return stack(outfitOf(f), false);
+  }
+
   function renderRoom() {
     var prev = FITS[at(cur - 1)], next = FITS[at(cur + 1)];
-    fill("standL", [stack(outfitOf(prev), false)]);
-    fill("standR", [stack(outfitOf(next), false)]);
+    fill("standL", [mannequin(prev)]);
+    fill("standR", [mannequin(next)]);
     $("tapPrev").setAttribute("aria-label", "Try on the " + prev.name);
     $("tapNext").setAttribute("aria-label", "Try on the " + next.name);
 
     var m = matchingFit();
-    var has3d = m > -1 && !!FITS[m].model;
-    var show3d = has3d && view === "3d";
-    var mv = $("avatar");
-    if (show3d) {
-      var f = FITS[m];
+    var f = m > -1 ? FITS[m] : null;
+    var views = f ? viewsFor(f) : [["layers", "Mix"]];
+    if (!views.some(function (v) { return v[0] === view; })) view = views[0][0];
+
+    var mv = $("avatar"), art = $("artView"), lay = $("layered");
+    mv.hidden = view !== "3d"; art.hidden = !(view === "front" || view === "back"); lay.hidden = view !== "layers";
+    if (view === "3d") {
       if (mv.getAttribute("src") !== f.model) { mv.setAttribute("poster", f.poster || ""); mv.setAttribute("src", f.model); }
-      mv.setAttribute("alt", "3D avatar of Hugh wearing the " + f.name);
+      mv.setAttribute("alt", "3D model of Hugh wearing the " + f.name);
+    } else if (!art.hidden) {
+      art.src = f.art[view];
+      art.alt = "Illustration of Hugh wearing the " + f.name + ", " + view + " view";
+    } else {
+      var st = stack(outfit, true);
+      st.setAttribute("role", "img");
+      st.setAttribute("aria-label", "Hugh wearing " + wornIds().map(function (id) { return PIECES[id].name; }).join(", "));
+      fill("layered", [st]);
     }
-    mv.hidden = !show3d;
-    $("layered").hidden = show3d;
-    if (!show3d) {
-      var s = stack(outfit, true);
-      s.setAttribute("role", "img");
-      s.setAttribute("aria-label", "Hugh wearing " + wornIds().map(function (id) { return PIECES[id].name; }).join(", "));
-      fill("layered", [s]);
-    }
-    $("viewToggle").hidden = !has3d;
-    $("view3d").setAttribute("aria-pressed", show3d ? "true" : "false");
-    $("viewLayers").setAttribute("aria-pressed", show3d ? "false" : "true");
+    $("viewToggle").hidden = views.length < 2;
+    fill("viewToggle", views.map(function (v) {
+      var b = el("button", "", v[1]); b.type = "button";
+      b.setAttribute("aria-pressed", v[0] === view ? "true" : "false");
+      b.addEventListener("click", function () { view = v[0]; renderRoom(); });
+      return b;
+    }));
     fill("bars", FITS.map(function (_, k) { var b = el("span"); if (k <= cur) b.className = "on"; return b; }));
   }
 
@@ -94,7 +115,8 @@
     $("kicker").textContent = fit ? "WEARING NOW · " + fit.brand + " · " + (m + 1) + " OF " + n : "WEARING NOW · MIX AND MATCH";
     $("fitName").textContent = fit ? fit.name : "Your Custom Fit";
 
-    var rows = SLOTS.slice().reverse().map(function (s) {
+    var shown = SLOTS.slice().reverse().filter(function (s) { return MIX || outfit[s.id]; });
+    var rows = shown.map(function (s) {
       var pid = outfit[s.id], p = PIECES[pid];
       var row = el("div", "piece");
       var sw = el("div", "swatch"); sw.style.background = p ? p.color : "transparent";
@@ -102,6 +124,7 @@
       var info = el("div", "info");
       info.appendChild(el("div", "slot", s.label.toUpperCase() + (p ? " · " + p.brand : "")));
       info.appendChild(el("div", "pname", p ? p.name : "None"));
+      if (p && p.detail) info.appendChild(el("div", "detail", p.detail));
       var price = el("div", "price", p ? money(p.price) : "");
       var swap = el("div", "swap");
       var back = el("button", "", "‹"), fwd = el("button", "", "›");
@@ -111,7 +134,8 @@
       back.addEventListener("click", function () { cycle(s, -1); });
       fwd.addEventListener("click", function () { cycle(s, 1); });
       swap.append(back, fwd);
-      row.append(sw, info, price, swap);
+      row.append(sw, info, price);
+      if (MIX) row.appendChild(swap);
       if (p) {
         var add = el("button", "add-one", "+");
         add.type = "button";
@@ -124,6 +148,11 @@
       return row;
     });
     fill("pieceList", rows);
+    var count = wornIds().length;
+    $("addFit").textContent = count > 1 ? "Add the full fit to bag" : "Add to bag";
+    $("lede").textContent = MIX
+      ? "Everything on the model is for sale. Swap any piece with ‹ › to build your own fit."
+      : "Everything on the model is for sale" + (count > 1 ? ". Get the whole fit or one piece." : ".");
 
     fill("chips", FITS.map(function (f, k) {
       var b = el("button", k === m ? "on" : "", f.brand);
@@ -138,10 +167,11 @@
 
   function saveKey() { var m = matchingFit(); return m > -1 ? FITS[m].id : "custom:" + wornIds().join("+"); }
   function render() { renderRoom(); renderPanel(); }
-  function go(i) { cur = at(i); outfit = outfitOf(FITS[cur]); view = "3d"; render(); }
+  function go(i) { cur = at(i); outfit = outfitOf(FITS[cur]); view = defaultView(FITS[cur]); render(); }
 
   function cycle(slot, dir) {
-    var opts = Object.keys(PIECES).filter(function (id) { return PIECES[id].slot === slot.id; });
+    // Only pieces with layer art can be swapped onto the model
+    var opts = Object.keys(PIECES).filter(function (id) { return PIECES[id].slot === slot.id && PIECES[id].layer; });
     if (slot.optional) opts.unshift(null);
     var i = opts.indexOf(outfit[slot.id] || null);
     outfit[slot.id] = opts[((i + dir) % opts.length + opts.length) % opts.length];
@@ -229,8 +259,6 @@
   $("tapNext").addEventListener("click", function () { go(cur + 1); });
   $("addFit").addEventListener("click", function () { addPieces(wornIds()); });
   $("railAdd").addEventListener("click", function () { $("addFit").click(); });
-  $("view3d").addEventListener("click", function () { view = "3d"; renderRoom(); });
-  $("viewLayers").addEventListener("click", function () { view = "layers"; renderRoom(); });
   $("saveBtn").addEventListener("click", function () {
     var key = saveKey(); saved[key] = !saved[key]; renderPanel(); toast(saved[key] ? "Fit saved" : "Removed from saved");
   });
@@ -250,7 +278,7 @@
   var hash = location.hash.slice(1);
   var startFit = FITS.findIndex(function (f) { return f.id === hash; });
   go(startFit > -1 ? startFit : 0);
-  if (hash.indexOf("fit=") === 0) {
+  if (MIX && hash.indexOf("fit=") === 0) {
     var ids = hash.slice(4).split("+").filter(function (id) { return PIECES[id]; });
     if (ids.length) {
       SLOTS.forEach(function (s) { outfit[s.id] = null; });
