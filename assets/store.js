@@ -89,7 +89,7 @@
 
     var m = matchingFit();
     var f = m > -1 ? FITS[m] : null;
-    var ok = { "3d": !!(f && f.model), layers: MIX };
+    var ok = { "3d": SHOP.show3d !== false && !!(f && f.model), layers: MIX };
     TURN.forEach(function (v) { ok[v] = !!(f && f.views && f.views[v]); });
     if (!ok[view]) view = f ? defaultView(f) : "layers";
 
@@ -109,19 +109,18 @@
       fill("layered", [st]);
     }
 
-    // View controls: turn left · current angle · turn right · 3D
+    // View controls: the angle label itself turns Hugh (Front → Right side → Back → Left side)
     var kids = [];
     if (f && f.views) {
-      kids.push(viewButton("↶", "Turn left", null, function () { turn(-1); }));
-      var lab = el("span", "angle", turning ? TURN_LABEL[view] : "Turn");
-      lab.setAttribute("aria-live", "polite");
+      var lab = viewButton(turning ? TURN_LABEL[view] : "Front", "Turn: showing " + (turning ? TURN_LABEL[view] : "3D") + ". Tap for the next angle", null, function () { turn(1); });
+      lab.className = "angle";
       kids.push(lab);
-      kids.push(viewButton("↷", "Turn right", null, function () { turn(1); }));
     }
+    $("turnL").hidden = $("turnR").hidden = !(f && f.views);
     if (ok["3d"]) kids.push(viewButton("3D", "Show in 3D", view === "3d", function () { view = view === "3d" ? "front" : "3d"; renderRoom(); }));
     if (MIX) kids.push(viewButton("Mix", "Mix and match", view === "layers", function () { view = "layers"; renderRoom(); }));
     fill("viewToggle", kids);
-    $("viewToggle").hidden = kids.length < 2;
+    $("viewToggle").hidden = kids.length < 1;
     fill("bars", FITS.map(function (_, k) { var b = el("span"); if (k <= cur) b.className = "on"; return b; }));
   }
 
@@ -271,6 +270,8 @@
     if (e.key === "Escape" && !$("drawer").hidden) openBag(false);
   });
 
+  $("turnL").addEventListener("click", function () { turn(-1); });
+  $("turnR").addEventListener("click", function () { turn(1); });
   $("tapPrev").addEventListener("click", function () { go(cur - 1); });
   $("tapNext").addEventListener("click", function () { go(cur + 1); });
   $("addFit").addEventListener("click", function () { addPieces(wornIds()); });
